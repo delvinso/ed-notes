@@ -4,3 +4,5 @@ processed/
 .ipynb_checkpoints/
 **ipynb 
 **tar.gz
+notebooks/
+__pycache__
