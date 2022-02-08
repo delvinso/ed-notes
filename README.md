@@ -28,3 +28,11 @@ pip3 install --user https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/
 pip3 install --user https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.4.0/en_core_sci_sm-0.4.0.tar.gz
 ```
 Model URLs can be obtained from [here](https://allenai.github.io/scispacy/) if they're outdated.
+
+
+### Scripts
+
+`pre_process_crystal.py` - concatenates all crystal notes and restores original note by joining each patient-visit-note type together
+`filter_parse_ed_notes.py` - filters only relevant notes of interest and casts into a wide dataframe
+`negation_pipeline.py` - proof of concept pipeline implementing entity recognition and negation detection in SpaCy
+`demo.py` - a streamlit app showcasing the pipeline with queries and entity highlighting
