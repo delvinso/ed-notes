@@ -32,7 +32,7 @@ def main():
 
         st.write("Results", results)
 
-        matcher0 = match(nlp, [e['Text'] for e in entities], "NEG_ENTITY")
+        matcher0 = match(nlp, [e['Entity'] for e in entities], "NEG_ENTITY")
         doc0 = overwrite_ent_lbl(matcher0, nlp(note))
         visualize_ner(title = "Negated Entities (this does NOT SHOW asserted entities)",
                       doc = doc0,

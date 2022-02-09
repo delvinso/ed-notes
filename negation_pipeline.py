@@ -100,7 +100,7 @@ def get_negation_entities(nlp_model: spacy.Language, text:str, print_sentences:b
 
     #                     results.append((e.text, negated, feature))
 
-                results.append({'Text': ent.text,
+                results.append({'Entity': ent.text,
                      'Start/End': (ent.start_char, ent.end_char),
                      'Label': ent.label_,
                     #  'Explanation': spacy.explain(ent._.negex),
@@ -116,7 +116,7 @@ def query_results(query:str, entity_results:list[dict[str]]) -> list[dict[str]]:
     searches list of entities for query and returns relevant items
     """
     
-    return [item for item in entity_results if query in item['Text']]
+    return [item for item in entity_results if query in item['Entity']]
     
     
     
