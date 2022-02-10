@@ -8,7 +8,7 @@ import spacy
 from negspacy.negation import Negex
 from negspacy.termsets import termset
 from pprint import pprint
-
+from typing import List, Dict
 
 # lemma_model_str = "en_core_sci_sm"
 # lemma_model = spacy.load(lemma_model_str)
@@ -62,8 +62,33 @@ def create_negation_model(nlp_model:str = "en_ner_bc5cdr_md") -> spacy.Language:
     
     return nlp
 
+def custom_sentencizer(text) -> List[str]:
+    """
+    Splits each ED note into sections based on spaces, and each resulting 'section' into 'sentences' consisting of 2+ or 
+    more  spaces. We could split on periods but empirically it seems that collective statements seem to be delimited on 2+ 
+    spaces. Splitting on a period could break up the statements into less meaningful sentences.
+    """
+    sentences = []
 
-def get_negation_entities(nlp_model: spacy.Language, text:str, print_sentences:bool = False) -> list[dict[str]]:
+    # why are these headers - only found this through empirical testing..
+    text = text.split("         ")
+    text = [segment for segment in text if segment != ""]
+
+    for i, segment in enumerate(text):
+
+        # for each section, split on two spaces or more to get sentences. also found this empirically...
+        for sentence in re.split(r'\s{2,}', segment):
+            sentence2 = sentence.strip()
+            sentences.append(sentence2)
+
+                # continue splitting since the pattern failed, splits on ...
+                # if len(sentence2) > 500: 
+                #     long_sentences.
+                # more_sentences = sentence2.split('.')
+    return sentences
+
+
+def get_negation_entities(nlp_model: spacy.Language, text:str, print_sentences:bool = False) -> List[Dict[str, str]]:
     """
     splits text into headers and performs entity extraction followed by negation detection on said entities.
     returns a list of tuple, each tuple is an entity and whether it is negated or asserted.
@@ -72,46 +97,31 @@ def get_negation_entities(nlp_model: spacy.Language, text:str, print_sentences:b
     results = []
     
     text = text.lower()
+    sentences = custom_sentencizer(text)
     
-    # why are these headers???? only found this through empirical testing..
-    # creates sections
-    text = text.split("         ")
-    
-    text = [segment for segment in text if segment != ""]
+    for sentence in sentences:
+        doc = nlp_model(sentence)
+        for ent in doc.ents:
 
-    # for each section, split on two spaces or more to get sentences. also found this empirically...
-    for segment in text:
-        
-        for sentence in re.split(r'\s{2,}', segment):
+            # if e.label_ == "DISEASE":
+            if ent._.negex == True:
+                feature = 0
+                negated = 1
+            elif ent._.negex == False:
+                feature = 1 
+                negated = 0
 
-            if print_sentences:
-                print(sentence.strip() + '\n')
-
-            # perform entity extraction and negation detection per sentence.
-            doc = nlp_model(sentence.strip())
-
-            for ent in doc.ents:
-
-                # if e.label_ == "DISEASE":
-                if ent._.negex == True:
-                    feature = 0
-                elif ent._.negex == False:
-                    feature = 1 
-
-    #                     results.append((e.text, negated, feature))
-
-                results.append({'Entity': ent.text,
-                     'Start/End': (ent.start_char, ent.end_char),
-                     'Label': ent.label_,
-                    #  'Explanation': spacy.explain(ent._.negex),
-                     'Negated' : ent._.negex,
-                     'Asserted': feature,
-                     'Sentence': sentence.strip(),
-                    })
+            results.append({'Entity': ent.text,
+                    'Start/End': (ent.start_char, ent.end_char),
+                    'Label': ent.label_,
+                    'Negated' : negated,
+                    'Affirmed': feature,
+                    'Sentence': sentence.strip(),
+                })
 
     return results
 
-def query_results(query:str, entity_results:list[dict[str]]) -> list[dict[str]]:
+def query_results(query:str, entity_results:List[Dict[str, str]]) -> List[Dict[str, str]]:
     """
     searches list of entities for query and returns relevant items
     """
