@@ -8,8 +8,6 @@ master_key = df[['CSN', 'MRN']].to_dict(orient = 'records')
 with open("master_key.json", "w") as f:
     json.dump(master_key, f, indent=4)
 
-# we drop the MRN because it is not unique, the CSN is.
-df2 = df.drop(columns = ['MRN', 'Patient Name', 'Sex', 'Date of Birth', 'Age (Years)', 'Address', 'Postal Code', 'City', 'Province', 'Country', 'Provider to Dispo', 'EMS Offload Time'])
 
 # remove standard pattern consisting of John doe, a X y.o. Y m.o male presented....
 df['ED Provider Notes'] = df['ED Provider Notes'].replace("^([A-Za-z].*?)presented", "[Patient Name Redacted] presented", regex = True)
@@ -26,4 +24,8 @@ cts['year'] = df['year']
 summary_cts = cts.groupby('year')['ED Provider Notes'].agg(['sum', 'count'])
 summary_cts['prop'] = summary_cts['sum']/summary_cts['count']
 df = df.drop(columns = ['year'])
-df.to_csv('processed/ed-notes-tidy-patient-no-metadata.csv', index = False)
+
+# we drop the MRN because it is not unique, the CSN is.
+df2 = df.drop(columns = ['MRN', 'Patient Name', 'Sex', 'Date of Birth', 'Age (Years)', 'Address', 'Postal Code', 'City', 'Province', 'Country', 'Provider to Dispo', 'EMS Offload Time'])
+
+df2.to_csv('processed/ed-notes-tidy-patient-no-metadata.csv', index = False)
