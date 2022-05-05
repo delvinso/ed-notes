@@ -6,4 +6,6 @@ processed/
 **tar.gz
 notebooks/
 __pycache__
-*json*
+**json
+.pytest_cache
+**archive
