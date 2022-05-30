@@ -5,7 +5,7 @@ This repository contains code for pre-processing and extracting clinical symptom
 ### Set-Up
 
 ```
-conda env create -f environment.yml
+conda env create -f medsp-environment.yml
 conda activate ed-notes
 conda env list # sanity check
 ```
@@ -34,5 +34,4 @@ Model URLs can be obtained from [here](https://allenai.github.io/scispacy/) if t
 
 - `pre_process_crystal.py` - concatenates all crystal notes and restores original note by joining each patient-visit-note type together
 - `filter_parse_ed_notes.py` - filters only relevant notes of interest and casts into a wide dataframe
-- `negation_pipeline.py` - proof of concept pipeline implementing entity recognition and negation detection in SpaCy
-- `demo.py` - a streamlit app showcasing the pipeline with queries and entity highlighting
+- `remove_patient_md.py` - removes patient metadata from notes and names (where applicable) at beginning of note
